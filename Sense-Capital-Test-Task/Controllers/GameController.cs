@@ -18,15 +18,20 @@ namespace Sense_Capital_Test_Task.Controllers
         [HttpGet]
         public IActionResult GetGames()
         {
-          
-            return Ok();
+         var r = _gameService.GetGames();
+
+            return Ok(r);
 
 
         }
+
         [HttpGet("{id:int}")]
-        public IActionResult GetGamesById(int id)
+        public IActionResult GetGameById(int id)
         {
-            return Ok();
+            var r = _gameService.GetGameById(id);
+            if (r != null) return Ok(r);
+            return BadRequest();
+
 
         }
 
@@ -52,7 +57,9 @@ namespace Sense_Capital_Test_Task.Controllers
         [HttpDelete("{id:int}")]
         public IActionResult ClearField(int id)
         {
-            return Ok();
+            var i = _gameService.DeleteGame(id);
+            if (i) return Ok();
+            return BadRequest();
 
 
         }
