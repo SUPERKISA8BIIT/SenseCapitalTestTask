@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SenseCapital.Model;
+using SenseCapital.Service;
 
 namespace Sense_Capital_Test_Task.Controllers
 {
@@ -7,10 +8,17 @@ namespace Sense_Capital_Test_Task.Controllers
     [ApiController]
     public class GameController : ControllerBase
     {
+        private readonly GameService _gameService;
+
+        public GameController(GameService gameService)
+        {
+            _gameService = gameService;
+        }
 
         [HttpGet]
         public IActionResult GetGames()
         {
+          
             return Ok();
 
 
@@ -25,7 +33,9 @@ namespace Sense_Capital_Test_Task.Controllers
         [HttpPost]
         public IActionResult PostTurn(Game game)
         {
-            return Ok();
+         var id = _gameService.CreateGame(game);
+
+            return Ok(id);
 
 
         }
