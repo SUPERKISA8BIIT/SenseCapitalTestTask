@@ -1,0 +1,213 @@
+{
+	"info": {
+		"_postman_id": "ba73070d-21bd-42f8-a0b6-06afd3086652",
+		"name": "Test task",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Begin Game",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "AccessToken",
+						"value": "{{accessToken}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"field\": [\r\n        [\r\n            null,\r\n            null,\r\n            null\r\n        ],\r\n        [\r\n            null,\r\n            null,\r\n            null\r\n        ],\r\n        [\r\n            null,\r\n            null,\r\n            null\r\n        ]\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/Game",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"Game"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Accept",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "AccessToken",
+						"value": "{{accessTokenSecond}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/api/Game/64137f330675cb6823e8dc14/accept",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"Game",
+						"64137f330675cb6823e8dc14",
+						"accept"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Turn",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "AccessToken",
+						"value": "{{accessToken}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"field\": [\r\n        [\r\n            null,\r\n            null,\r\n            null\r\n        ],\r\n        [\r\n            false,\r\n            null,\r\n            null\r\n        ],\r\n        [\r\n            null,\r\n            null,\r\n            null\r\n        ]\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/Game/2",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"Game",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "AccessToken",
+						"value": "{{accessToken}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/api/Game",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"Game"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get by id",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "AccessToken",
+						"value": "{{accessToken}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/api/Game/23",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"Game",
+						"23"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Game",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "AccessToken",
+						"value": "{{accessToken}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/api/Game/23",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"Game",
+						"23"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "https://localhost:7076",
+			"type": "default"
+		},
+		{
+			"key": "accessToken",
+			"value": "12345678",
+			"type": "default"
+		},
+		{
+			"key": "accessTokenSecond",
+			"value": "3221",
+			"type": "default"
+		}
+	]
+}
