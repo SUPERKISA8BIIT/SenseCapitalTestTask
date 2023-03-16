@@ -14,7 +14,13 @@ namespace Sense_Capital_Test_Task.Controllers
         {
             _gameService = gameService;
         }
+        protected string AccessToken
+        {
+            get { Request.Headers.TryGetValue("AccessToken", out var headerValue);
+                return headerValue;
+            }
 
+        }
         [HttpGet]
         public IActionResult GetGames()
         {
@@ -38,12 +44,28 @@ namespace Sense_Capital_Test_Task.Controllers
         [HttpPost]
         public IActionResult PostTurn(Game game)
         {
+            if (String.IsNullOrEmpty(AccessToken)) return Unauthorized();
+            game.KeyOfFirstPlayer = AccessToken;
          var id = _gameService.CreateGame(game);
 
             return Ok(id);
 
 
         }
+
+        [HttpPost("{id:int}/accept")]
+
+        public IActionResult PostTurn(int id)
+        {
+            if (String.IsNullOrEmpty(AccessToken)) return Unauthorized();
+           var f = _gameService.AcceptGame(id, AccessToken);
+            if (f) return Ok(f);
+            return BadRequest();
+
+        }
+
+
+
 
         [HttpPut("{id:int}")]
 
@@ -53,7 +75,7 @@ namespace Sense_Capital_Test_Task.Controllers
 
 
         }
-        //
+        
         [HttpDelete("{id:int}")]
         public IActionResult ClearField(int id)
         {
