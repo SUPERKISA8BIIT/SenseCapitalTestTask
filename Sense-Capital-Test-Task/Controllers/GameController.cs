@@ -53,7 +53,7 @@ namespace Sense_Capital_Test_Task.Controllers
             return Ok(id);
         }
 
-        [HttpPost("{id}/accept")]
+        [HttpPost(@"{id:length(24)}/accept")]
         public IActionResult PostTurn(string id)
         {
             if (string.IsNullOrEmpty(AccessToken)) return Unauthorized("Send AccessToken in Header");
@@ -75,7 +75,7 @@ namespace Sense_Capital_Test_Task.Controllers
         }
         
         [HttpDelete("{id}")]
-        public IActionResult ClearField(string id)
+        public IActionResult DeleteGame(string id)
         {
             var result = _gameService.DeleteGame(id);
             if (result) return Ok(result);

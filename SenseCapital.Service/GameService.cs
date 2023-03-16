@@ -53,9 +53,9 @@ namespace SenseCapital.Service
             var filter = Builders<Game>.Filter.Eq(x => x.BsonId, ObjectId.Parse(id));
             var acceptedGame = Builders<Game>.Update.Set(x => x.KeyOfSecondPlayer, accessToken);
 
-            var result = _gameCollection.FindOneAndUpdate(filter, acceptedGame);
+            var result = _gameCollection.UpdateOne(filter, acceptedGame);
 
-            return result.KeyOfSecondPlayer == accessToken;
+            return result.ModifiedCount > 0;
         }
 
         public Game GameLogic(Game newGameVersion, string accessToken)
@@ -149,6 +149,21 @@ namespace SenseCapital.Service
                 }
                 if (triggerI) return true;
             }
+
+            //check if draw
+            var c = 0;
+            for (int j = 0; j < 3; j++)
+            {
+              
+                for (int i = 0; i < 3; i++)
+                {
+                    if (field[i][j] != null)
+                        c++;
+                }
+                if (c == 9) return true;
+            }
+
+
             return false;
         }
     }
