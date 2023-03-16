@@ -6,79 +6,95 @@ namespace SenseCapital.Service
 {
     public class GameService
     {
+        protected IMongoCollection<Game> _gameCollection => _client.GetDatabase("tick_crossdb").GetCollection<Game>("GamesCollection");
+
         private readonly MongoClient _client;
         public GameService(MongoClient client)
         {
             _client = client;
-        }
-        
+        }      
       
 
-        public int CreateGame(Game game)
+        public string CreateGame(Game game)
         {
-            _client.GetDatabase("tick_crossdb").GetCollection<Game>("GamesCollection").InsertOne(game);
-            return game.Id;
+            _gameCollection.InsertOne(game);
+
+            return game.BsonId.ToString();
         }
 
-        public bool DeleteGame(int id)
+        public bool DeleteGame(string id)
         {
-            
-            var filter = Builders<Game>.Filter.Eq("Id", id);
-            var result = _client.GetDatabase("tick_crossdb").GetCollection<Game>("GamesCollection").DeleteOne(filter);
+            var filter = Builders<Game>.Filter.Eq(x => x.BsonId, ObjectId.Parse(id));
+
+            var result = _gameCollection.DeleteOne(filter);
+
             if(result.DeletedCount > 0 ) return true;
             return false;           
         }
 
         public List<Game> GetGames()
         {
-            var dbList = _client.GetDatabase("tick_crossdb").GetCollection<Game>("GamesCollection").AsQueryable();
+            var dbList = _gameCollection.AsQueryable();
+
             return dbList.ToList();
         }
 
-        public Game GetGameById(int id)
+        public Game GetGameById(string id)
         {
-            var filter = Builders<Game>.Filter.Eq("Id", id);
-            var result = _client.GetDatabase("tick_crossdb").GetCollection<Game>("GamesCollection").Find(filter).Limit(1).Single();
+            var filter = Builders<Game>.Filter.Eq(x => x.BsonId, ObjectId.Parse(id));
+
+            var result = _gameCollection.Find(filter).Limit(1).Single();
+
             return result;      
         }
 
-        public bool AcceptGame(int id, string accessToken)
+        public bool AcceptGame(string id, string accessToken)
         {
-            var filter = Builders<Game>.Filter.Eq("Id", id);
-            var cake = Builders<Game>.Update.Set(x => x.KeyOfSecondPlayer, accessToken);
+            var filter = Builders<Game>.Filter.Eq(x => x.BsonId, ObjectId.Parse(id));
+            var acceptedGame = Builders<Game>.Update.Set(x => x.KeyOfSecondPlayer, accessToken);
 
-            var result = _client.GetDatabase("tick_crossdb").GetCollection<Game>("GamesCollection").FindOneAndUpdate<Game>(filter, cake);
+            var result = _gameCollection.FindOneAndUpdate(filter, acceptedGame);
 
             return result.KeyOfSecondPlayer == accessToken;
         }
 
-        public Game GameLogic(Game g, string accessToken)
+        public Game GameLogic(Game newGameVersion, string accessToken)
         {
-            if (g.Field.Length != 3 || g.Field.Any(x => x.Length != 3)) throw new Exception();
-            var prevTurn = GetGameById(g.Id);
+            //--- Validating --//
+            if (newGameVersion.Field.Length != 3 || newGameVersion.Field.Any(x => x.Length != 3)) throw new Exception();
+
+            var prevGameVerision = GetGameById(newGameVersion.BsonId.ToString());
+
             var fullFieldCount = 0;
             var changedCellsCount = 0;
-            for(var i = 0; i < g.Field.Length; i++)
+            for(var i = 0; i < newGameVersion.Field.Length; i++)
             {
-                for (var j = 0; j < g.Field.Length; j++)
+                for (var j = 0; j < newGameVersion.Field.Length; j++)
                 {
-                    if (prevTurn.Field[i][j] != null) fullFieldCount++;
-                    if( (prevTurn.Field[i][j] != g.Field[i][j]) && prevTurn.Field[i][j] == null) changedCellsCount++;
-                    if ((prevTurn.Field[i][j] != g.Field[i][j]) && prevTurn.Field[i][j] != null) throw new Exception(); 
+                    if (prevGameVerision.Field[i][j] != null)
+                        fullFieldCount++;
+                    if( (prevGameVerision.Field[i][j] != newGameVersion.Field[i][j]) && prevGameVerision.Field[i][j] == null)
+                        changedCellsCount++;
+                    if ((prevGameVerision.Field[i][j] != newGameVersion.Field[i][j]) && prevGameVerision.Field[i][j] != null)
+                        throw new Exception(); 
                 }
             }
 
-            if ((fullFieldCount % 2 == 0) && accessToken != g.KeyOfFirstPlayer) throw new Exception();
-            else if ((fullFieldCount % 2 != 0) && accessToken != g.KeyOfSecondPlayer) throw new Exception();
+            if ((fullFieldCount % 2 == 0) && accessToken != prevGameVerision.KeyOfFirstPlayer) throw new Exception();
+            else if ((fullFieldCount % 2 != 0) && accessToken != prevGameVerision.KeyOfSecondPlayer) throw new Exception();
             if (changedCellsCount != 1) throw new Exception();
-            if(fullFieldCount % 2 == 0) g.IsFinished = CheckWinner(false, g.Field);
-            else g.IsFinished = CheckWinner(true, g.Field);
-           
-            var filter = Builders<Game>.Filter.Eq("Id", g.Id);
-            var cake = Builders<Game>.Update.Set(x => x.KeyOfSecondPlayer, accessToken);
+            //--- ------ --//
 
-            var result = _client.GetDatabase("tick_crossdb").GetCollection<Game>("GamesCollection").ReplaceOne(filter, g);
-            return g;
+            if (fullFieldCount % 2 == 0) newGameVersion.IsFinished = CheckWinner(false, newGameVersion.Field);
+            else newGameVersion.IsFinished = CheckWinner(true, newGameVersion.Field);
+
+            var filter = Builders<Game>.Filter.Eq(x => x.BsonId, newGameVersion.BsonId);
+            var newTurn = Builders<Game>.Update
+                .Set(x => x.Field, newGameVersion.Field)
+                .Set(x => x.IsFinished, newGameVersion.IsFinished);
+
+            var result = _gameCollection.FindOneAndUpdate(filter, newTurn);
+            return newGameVersion;
         }
 
         private static bool CheckWinner(bool? team, bool?[][] field)
