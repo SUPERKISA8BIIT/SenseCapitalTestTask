@@ -7,6 +7,7 @@
     <RootNamespace>Sense_Capital_Test_Task</RootNamespace>
     <UserSecretsId>6706703f-c5a0-4ba3-9dae-8dbd4087b4e3</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
